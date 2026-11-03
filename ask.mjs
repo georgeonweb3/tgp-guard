@@ -5,6 +5,7 @@ const [,, id, method, endpoint, payload] = process.argv;
 const N = "https://devnode.telegraphprotocol.com";
 const signer = privateKeyToAccount(process.env.EVM_PRIVATE_KEY);
 const client = new x402Client();
+client.setSpendControls({ allowedAssets: [{ network: "eip155:11155111", asset: "0xcc194e1a843B658526D0D5C431f670028582Ae17", maxAmountPerPayment: "10000" }] });
 registerExactEvmScheme(client, { signer });
 const f = wrapFetchWithPayment(fetch, client);
 const res = await f(`${N}/engine/v1/ask/${id}`, {

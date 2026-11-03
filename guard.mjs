@@ -14,12 +14,13 @@ const KRAKEN = { bitcoin: "XBTUSD", ethereum: "ETHUSD", solana: "SOLUSD" };
 if (!KRAKEN[asset]) { console.error("asset must be: " + Object.keys(KRAKEN).join(", ")); process.exit(1); }
 
 const client = new x402Client();
+client.setSpendControls({ allowedAssets: [{ network: "eip155:11155111", asset: "0xcc194e1a843B658526D0D5C431f670028582Ae17", maxAmountPerPayment: "10000" }] });
 registerExactEvmScheme(client, { signer: privateKeyToAccount(process.env.EVM_PRIVATE_KEY) });
 const pay = wrapFetchWithPayment(fetch, client);
 
 const voters = [
   { name: "TxLens", id: "9002", endpoint: "/crypto-price", payload: { coin_id: asset }, parse: r => r.price_usd },
-  { name: "CoinGecko", id: "21002", endpoint: "/query", payload: { ids: asset, vs_currencies: "usd" }, parse: r => r[asset]?.usd },
+  { name: "CoinGecko", id: "32001", endpoint: "/query", payload: { ids: asset, vs_currencies: "usd" }, parse: r => r[asset]?.usd },
   { name: "Kraken", id: down ? "999999999" : "190076", endpoint: "/query", payload: { pair: KRAKEN[asset] },
     parse: r => { const p = Object.values(r.result || {})[0]; return p && parseFloat(p.c[0]); } },
 ];
