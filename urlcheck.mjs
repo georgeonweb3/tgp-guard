@@ -8,6 +8,7 @@ const down = args.includes("--down");
 const url = args.find(a => !a.startsWith("--"));
 if (!url || !/^https?:\/\//i.test(url)) { console.error('usage: urlcheck.mjs "https://..." [--down]'); process.exit(1); }
 const client = new x402Client();
+client.setSpendControls({ allowedAssets: [{ network: "eip155:11155111", asset: "0xcc194e1a843B658526D0D5C431f670028582Ae17", maxAmountPerPayment: "10000" }] });
 registerExactEvmScheme(client, { signer: privateKeyToAccount(process.env.EVM_PRIVATE_KEY) });
 const pay = wrapFetchWithPayment(fetch, client);
 const BAD = /(suspicious|malicious|phish|malware|unsafe|threat_detected|high)/i;
