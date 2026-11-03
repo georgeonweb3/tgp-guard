@@ -17,7 +17,8 @@ Each mission claim is testable separately: price verdicts (Mission 14/01), sanct
 Before an agent swaps, pays, or clicks, tgp-guard buys independent checks through Telegraph and returns one verdict:
 - **Price check** (CRYPTO_PRICE): TxLens 9002, CoinGecko 32001, Kraken 190076. Spread >0.5% HOLD, >2% BLOCK, quote >1% off median BLOCK.
 - **Sanctions screen** (SANCTIONS_SCREENING_MATCH): OFAC SDN 78021, UN Consolidated 78022. Any hit BLOCK; a list unavailable HOLD.
-- **Link check** (URL_SCAN): URL Sentinel 5001, NetWire 7334. 2+ flags BLOCK; 1 flag or unknown HOLD. (Third voter ProofGate 7402 was retired by the network; with the seat empty the check fails closed to HOLD — see Limitations.)
+- **Link check** (URL_SCAN): URL Sentinel 5001, NetWire 7334, PREFLIGHT 20260828. 2+ flags BLOCK; 1 flag or unknown HOLD. (Third voter ProofGate 7402 was retired by the network; a systematic probe of all 19 URL_SCAN miners in the directory on 2026-11-03 found PREFLIGHT as a qualifying replacement — full record in LINKCHECK-FINDINGS.md.)
+- **Contract audit** (SMART_CONTRACT_AUDIT): GoPlus Security 200001 (honeypot, tax, ownership, proxy and mint flags) + Sourcify 200002 (verified source). Any critical risk flag BLOCK; risk data clean *and* source verified ALLOW; either source unable to assess HOLD. This is Mission 14's "analysis before committing capital" bought directly, and the "contract audit" item in Mission 01's listings-desk brief.
 Fails closed throughout: a missing source never produces ALLOW.
 
 ## Verified live results (2026-11-03, event period; logs in evidence/season2-refresh/)
@@ -25,8 +26,10 @@ Fails closed throughout: a missing source never produces ALLOW.
 - Sanctions, "Acme Bakery": **ALLOW** — no match on either list
 - Sanctions, "Laden": **BLOCK** — listed on OFAC SDN and UN Consolidated
 - Price, bitcoin quoted $50,000 vs $77,217 median: **BLOCK** — 35.25% off-market
-- Link, https://github.com: **HOLD** — both live voters CLEAN, third seat empty (fails closed)
-- Typical full preflight: 7 paid answers, ~$0.07 total. Failed miner asks are not billed (escrow credit).
+- Link, https://github.com: **HOLD** in the morning run — both live voters CLEAN, third seat empty (fails closed); after PREFLIGHT 20260828 was added as third voter the same day: **ALLOW** — 3/3 CLEAN (also ALLOW for https://example.com)
+- Contract audit, USDT 0xdAC17F958D2ee523a2206206994597C13D831ec7 (Ethereum): **ALLOW** — no critical flags from GoPlus (owner controls noted: mintable, pausable, blacklist — not blocking), source verified on Sourcify; repeated run gave the identical verdict
+- Contract audit, Sepolia test USDC 0xcc194e1a843B658526D0D5C431f670028582Ae17: **HOLD** — GoPlus has no risk data for that chain and Sourcify has no verified source on file (fails closed)
+- Full preflight with all four checks (price + sanctions + link + audit): **ALLOW**, 10 paid answers, ~$0.10 total (the three-check version is 7 answers, ~$0.07). Failed miner asks are not billed (escrow credit).
 
 ## How to run it (reproduction)
     npm i
@@ -34,6 +37,7 @@ Fails closed throughout: a missing source never produces ALLOW.
     # Fund the burner on Ethereum Sepolia: a little Sepolia ETH for gas, and mint test USDC —
     # the payment token 0xcc194e1a843B658526D0D5C431f670028582Ae17 is open-mint (mint(address,uint256)); 20 is plenty.
     node --env-file=.env preflight.mjs --asset bitcoin --counterparty "Acme Bakery" --url https://github.com
+    node --env-file=.env preflight.mjs --contract 0xdAC17F958D2ee523a2206206994597C13D831ec7   # expect ALLOW (contract audit)
     node --env-file=.env preflight.mjs --counterparty "Laden"          # expect BLOCK
     node --env-file=.env guard.mjs bitcoin 50000                        # expect BLOCK (off-market quote)
 Full instructions in README.md, including honest limitations.
@@ -44,7 +48,7 @@ Full instructions in README.md, including honest limitations.
 - **Honest labels:** all results are testnet; no production customers yet; testnet use is not presented as paying production usage.
 
 ## Demo (to record before Dec 1)
-2–5 min screen recording script: run the happy-path preflight (ALLOW price + sanctions, HOLD link with explanation), then the "Laden" BLOCK, then the off-market-quote BLOCK; show one evidence/*.jsonl entry and its receipt hashes; close with the spend total.
+2–5 min screen recording script: run the happy-path four-check preflight (price + sanctions + link + contract audit, all ALLOW), then the "Laden" BLOCK, then the off-market-quote BLOCK; show one evidence/*.jsonl entry and its receipt hashes; close with the spend total.
 
 ## Milestones
 - **Nov 14 First Integration Milestone:** already satisfied in substance — first working Telegraph purchases made 2026-11-03 with receipts in evidence/season2-refresh/. Share in Discord before Nov 14.
@@ -52,7 +56,8 @@ Full instructions in README.md, including honest limitations.
 
 ## Limitations (honest)
 - Testnet only; no production traffic or customer adoption yet.
-- Link check has 2 live voters (ProofGate retired), so it cannot currently return ALLOW.
+- Link check has 3 live voters again (PREFLIGHT 20260828 replaced the retired ProofGate on 2026-11-03), but one of PREFLIGHT's own upstreams (URLhaus) reported unavailable in its answers; if PREFLIGHT leaves the network the check fails closed to HOLD again.
+- Contract audit depends on GoPlus chain coverage: on chains where GoPlus has no token data (e.g. Sepolia) the audit returns HOLD, and unverified-source contracts cannot be ALLOWed.
 - Sanctions screening is exact-name only; list coverage differs between OFAC and UN miners, which share one host.
 - Per-run spend cap is summarised after the run; the per-payment cap ($0.01) IS enforced before payment via setSpendControls.
 - preflight.mjs parses the sub-scripts' output; a shared module is the next refactor.

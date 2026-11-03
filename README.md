@@ -4,14 +4,15 @@ Before an agent acts (swap, pay, click), tgp-guard buys independent checks throu
 
 Network: Ethereum Sepolia testnet (eip155:11155111), x402, ~$0.01 per answer, via devnode.telegraphprotocol.com. Payment asset: USD Coin 0xcc194e1a843B658526D0D5C431f670028582Ae17 (test token, open mint — see Run). Failed calls are not charged: a settled payment for a failed request is credited to your Telegraph escrow balance instead.
 
-> Season II refresh (2026-11-03): the devnode moved from Base Sepolia to Ethereum Sepolia since Season I, and @x402 v2.28 rejects non-default assets unless they are allowlisted. The client now calls setSpendControls() with the payment token allowlisted and capped at exactly 10000 atomic units ($0.01) per payment. CoinGecko miner 21002 was retired by the network and replaced with 32001 (same /query interface). ProofGate 7402 was also retired; the link check currently runs on its two remaining voters and therefore returns HOLD (fails closed) until a compatible third voter is found. Live re-verification logs: evidence/season2-refresh/.
+> Season II refresh (2026-11-03): the devnode moved from Base Sepolia to Ethereum Sepolia since Season I, and @x402 v2.28 rejects non-default assets unless they are allowlisted. The client now calls setSpendControls() with the payment token allowlisted and capped at exactly 10000 atomic units ($0.01) per payment. CoinGecko miner 21002 was retired by the network and replaced with 32001 (same /query interface). ProofGate 7402 was also retired; on 2026-11-03 a systematic probe of all 19 URL_SCAN miners in the directory found a qualifying third voter — PREFLIGHT Infrastructure Signals 20260828 (GET /url-safe) — and the link check returns full verdicts again (first 3/3-CLEAN ALLOWs the same day). Full probe record: LINKCHECK-FINDINGS.md. A fourth check was added the same day: contract audit (audit.mjs) buying GoPlus Security token-risk data and Sourcify source verification (SMART_CONTRACT_AUDIT). Live re-verification logs: evidence/season2-refresh/.
 
 ## Checks (each fires multiple independent miners and compares)
 | Check | Intent | Miners | Rule |
 |---|---|---|---|
 | Price | CRYPTO_PRICE | TxLens 9002, CoinGecko 32001, Kraken 190076 | spread >0.5% HOLD, >2% BLOCK; quote >1% off median BLOCK |
 | Sanctions | SANCTIONS_SCREENING_MATCH | OFAC SDN 78021, UN list 78022 | any hit BLOCK; list unavailable HOLD |
-| Link | URL_SCAN | URL Sentinel 5001, NetWire 7334 (ProofGate 7402 retired) | 2+ flags BLOCK; 1 flag or unknown HOLD; with one voter seat empty the verdict is HOLD by design |
+| Link | URL_SCAN | URL Sentinel 5001, NetWire 7334, PREFLIGHT 20260828 (replaced ProofGate 7402, retired) | 2+ flags BLOCK; 1 flag or unknown HOLD |
+| Contract audit | SMART_CONTRACT_AUDIT | GoPlus Security 200001, Sourcify 200002 | critical risk flag (honeypot, >10% tax, unverified source…) BLOCK; risk data + verified source ALLOW; either source unable to assess HOLD |
 
 Fails closed: a missing source never produces ALLOW (price quorum 2-of-3 only with --quorum2).
 
@@ -24,15 +25,20 @@ Fails closed: a missing source never produces ALLOW (price quorum 2-of-3 only wi
     node --env-file=.env preflight.mjs --asset bitcoin --counterparty "Acme Bakery" --url https://github.com
     node --env-file=.env preflight.mjs --asset bitcoin --quote 79000 ...     # BLOCK: off-market quote
     node --env-file=.env preflight.mjs --counterparty "Laden" ...            # BLOCK: OFAC + UN listed
+    node --env-file=.env preflight.mjs --contract 0xdAC17F958D2ee523a2206206994597C13D831ec7   # audit check (USDT): ALLOW
     node --env-file=.env preflight.mjs ... --down                            # HOLD: simulated miner outage
 
-Individual checks: guard.mjs, screen.mjs, urlcheck.mjs. Raw paid call helper: ask.mjs. Logs: evidence/*.jsonl.
+Individual checks: guard.mjs, screen.mjs, urlcheck.mjs, audit.mjs. The audit check takes a contract
+address and an optional --chain (ethereum default; also bsc, base, arbitrum, polygon, optimism, sepolia):
+    node --env-file=.env audit.mjs 0xdAC17F958D2ee523a2206206994597C13D831ec7
+Raw paid call helper: ask.mjs. Logs: evidence/*.jsonl.
 
 ## Limitations (honest)
 - Testnet only; no production traffic or customer adoption.
 - Sanctions check is exact-name only; OFAC lists "LAZARUS GROUP" but the UN miner did not, so list coverage differs.
 - OFAC and UN miners share one host. URL Sentinel and NetWire may overlap in what they check.
-- Link check has only 2 live voters since ProofGate (7402) left the network, so it cannot currently return ALLOW; six candidate replacement miners were probed on 2026-11-03 and none matched the /scan interface.
+- Link check's third voter (PREFLIGHT 20260828) was found on 2026-11-03 after probing all 19 URL_SCAN miners in the directory (LINKCHECK-FINDINGS.md); one of its own upstream feeds (URLhaus) was unavailable in its answers, so its CLEAN rests on OpenPhish + Cloudflare DNS. If it leaves the network the check fails closed to HOLD again.
+- Contract audit covers chains GoPlus has token data for (Ethereum by default); on chains without GoPlus data (e.g. Sepolia) it returns HOLD, and a contract with no Sourcify record cannot be ALLOWed. Owner controls common on established tokens (mintable, pausable, blacklist — USDT has all three) are reported as notes, not blockers; only critical flags block.
 - The BLOCK link demo uses a synthetic suspicious URL, not live malware (the URLhaus feed is gone).
 - TxLens answers appear cached at times.
 - The per-run spend cap is checked after payment, not enforced before; the per-payment cap IS enforced before payment via setSpendControls (Season II refresh).

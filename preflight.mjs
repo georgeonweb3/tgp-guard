@@ -4,8 +4,9 @@ const a = process.argv.slice(2);
 const opt = k => { const i = a.indexOf(k); return i >= 0 ? a[i + 1] : null; };
 const down = a.includes("--down");
 const asset = opt("--asset"), quote = opt("--quote"), who = opt("--counterparty"), url = opt("--url");
-if (!asset && !who && !url) {
-  console.error('usage: preflight.mjs [--asset bitcoin [--quote 79000]] [--counterparty "NAME"] [--url https://...] [--down]');
+const contract = opt("--contract"), chain = opt("--chain");
+if (!asset && !who && !url && !contract) {
+  console.error('usage: preflight.mjs [--asset bitcoin [--quote 79000]] [--counterparty "NAME"] [--url https://...] [--contract 0xADDRESS [--chain bsc]] [--down]');
   process.exit(1);
 }
 const run = (label, script, args) => new Promise(res => {
@@ -20,6 +21,7 @@ const jobs = [];
 if (asset) jobs.push(run(`price check (${asset}${quote ? " @ " + quote : ""})`, "guard.mjs", [asset, ...(quote ? [quote] : [])]));
 if (who) jobs.push(run(`sanctions screen ("${who}")`, "screen.mjs", [who]));
 if (url) jobs.push(run(`link check`, "urlcheck.mjs", [url]));
+if (contract) jobs.push(run(`contract audit (${contract.slice(0, 10)}…${chain ? " on " + chain : ""})`, "audit.mjs", [contract, ...(chain ? ["--chain", chain] : [])]));
 const results = await Promise.all(jobs);
 const rank = { ALLOW: 0, HOLD: 1, BLOCK: 2 };
 const final = results.reduce((m, r) => rank[r.verdict] > rank[m] ? r.verdict : m, "ALLOW");
