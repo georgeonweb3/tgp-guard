@@ -14,7 +14,7 @@ const pay = wrapFetchWithPayment(fetch, client);
 const BAD = /(suspicious|malicious|phish|malware|unsafe|threat_detected|high)/i;
 const voters = [
   { name: "Preflight", id: "20260828", method: "GET", endpoint: "/url-safe",
-    cls: r => ((r.sources || []).some(s => s.listed) || (r.verdict && r.verdict !== "not_listed" && /listed/i.test(r.verdict))) ? "FLAG" : r.verdict === "not_listed" ? "CLEAN" : "UNKNOWN", show: r => `verdict=${r.verdict}` },
+    cls: r => ((r.sources || []).some(s => s.listed) || (r.verdict && !/^(not_listed|safe|clean)$/i.test(r.verdict) && /listed/i.test(r.verdict))) ? "FLAG" : /^(not_listed|safe|clean)$/i.test(r.verdict || "") ? "CLEAN" : "UNKNOWN", show: r => `verdict=${r.verdict}` },
   { name: "URLSentinel", id: down ? "999999999" : "5001", method: "POST", endpoint: "/scan",
     cls: r => /^safe$/i.test(r.verdict) ? "CLEAN" : BAD.test(r.verdict || "") ? "FLAG" : "UNKNOWN", show: r => r.verdict },
   { name: "NetWire", id: "7334", method: "GET", endpoint: "/url-scan",
