@@ -18,6 +18,11 @@ Network: Ethereum Sepolia testnet (eip155:11155111), x402, ~$0.01 per answer, vi
 
 Fails closed: a missing source never produces ALLOW (price quorum 2-of-3 only with --quorum2).
 
+## Mission use cases (each is its own working, testable flow)
+- **Mission 14 — pre-flight (the core):** `preflight.mjs --asset bitcoin --counterparty "Acme Bakery" --url https://github.com` — price + sanctions + link in one verdict. Live 2026-11-11: ALLOW, 9 paid answers, ~$0.09.
+- **Mission 01 — pre-swap check:** `swap.mjs --asset bitcoin --quote 74400 --counterparty "Acme Bakery" --contract 0xdAC17F958D2ee523a2206206994597C13D831ec7` — price integrity + counterparty sanctions + token contract audit before a swap executes. Live 2026-11-11: ALLOW, 8 paid answers, ~$0.08 (logs: evidence/swap-log.jsonl).
+- **Mission 02 — stablecoin acceptance:** `stablecoin.mjs --payer "Acme Bakery" --token USDT --contract 0xdAC17F958D2ee523a2206206994597C13D831ec7` — payer sanctions screen + token contract audit + reserve attestation bought from por-attest miner 27741 (GET /reserve). Live 2026-11-11: ALLOW, 6 paid answers, ~$0.06 — USDT fully backed, ratio 1.0434 as of 2026-09-30 (BDO ISAE 3000R). Logs: evidence/stablecoin-log.jsonl. Note: the first two runs that night held on transient miner settlement 402s (UN list + GoPlus) and cleared on retry — the guard fails closed, and the HOLDs are in the log.
+
 ## Run
     npm i
     echo "EVM_PRIVATE_KEY=0x<burner testnet key>" > .env   # never reuse a real wallet

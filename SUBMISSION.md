@@ -11,7 +11,10 @@
 - **Also claimed — Mission 01, Exchange.** The listings desk buys "contract audit, contributor authenticity, holder concentration and sanctions exposure in parallel." tgp-guard's sanctions screen (OFAC SDN + UN Consolidated) and multi-source price cross-check are directly that class of pre-listing / pre-trade evidence, returned as one signed-off verdict with receipts and a cost line.
 - **Also claimed — Mission 02, Stablecoin.** "Compliance screening attached to the payment itself as a proof": every tgp-guard verdict is backed by per-check Telegraph receipts, and the x402 spend is hard-capped per payment ($0.01 via client spend controls) — screening and spend discipline travel with the transaction.
 
-Each mission claim is testable separately: price verdicts (Mission 14/01), sanctions verdicts (Mission 01/02), and the receipt trail (all three) are independent outputs of the same app.
+Each mission claim is testable separately, and each now has its own working flow with its own live run (2026-11-11, logs in evidence/):
+- **Mission 14:** `preflight.mjs` — full preflight ALLOW, 9 paid answers, ~$0.09.
+- **Mission 01:** `swap.mjs` — pre-swap check (price + counterparty sanctions + token audit) ALLOW, 8 paid answers, ~$0.08.
+- **Mission 02:** `stablecoin.mjs` — stablecoin acceptance (payer sanctions + token audit + por-attest reserve attestation: USDT fully backed, ratio 1.0434 as of 2026-09-30) ALLOW, 6 paid answers, ~$0.06. Its first two runs held on transient miner settlement 402s and cleared on retry; the HOLDs are in the log.
 
 ## What it does
 Before an agent swaps, pays, or clicks, tgp-guard buys independent checks through Telegraph and returns one verdict:
