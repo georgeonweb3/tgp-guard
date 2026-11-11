@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tgp-guard — pre-flight guard for autonomous agents</title>
+<style>
+  :root{--bg:#0b0e14;--panel:#11151f;--panel2:#0d1117;--line:#232a3a;--txt:#d7dee9;--dim:#8b95a7;--green:#34d399;--red:#f87171;--amber:#fbbf24;--teal:#2dd4bf;--blue:#60a5fa}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.55}
+  a{color:var(--teal)}
+  .wrap{max-width:920px;margin:0 auto;padding:28px 20px 60px}
+  h1{font-size:34px;line-height:1.15;margin:6px 0 4px}
+  h2{font-size:21px;margin:34px 0 8px}
+  h3{font-size:16px;margin:0 0 6px}
+  p{margin:8px 0}
+  .kicker{color:var(--teal);font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:13px}
+  .sub{color:var(--dim);font-size:17px}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px;margin:2px 4px 2px 0;color:var(--dim)}
+  .pill b{color:var(--txt)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .card .n{font-size:26px;font-weight:800}
+  .card .l{color:var(--dim);font-size:13px}
+  .term{background:var(--panel2);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0}
+  .term-hd{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);color:var(--dim);font-size:13px}
+  .dot{width:11px;height:11px;border-radius:50%;background:#ff5f57}.dot:nth-child(2){background:#febc2e}.dot:nth-child(3){background:#28c840}
+  .term-bd{padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.65;white-space:pre-wrap;min-height:220px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .tab{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--txt);border-radius:999px;padding:7px 14px;font-size:14px}
+  .tab.on{border-color:var(--teal);color:var(--teal)}
+  .allow{color:var(--green);font-weight:700}.block{color:var(--red);font-weight:700}.hold{color:var(--amber);font-weight:700}
+  .dim{color:var(--dim)}
+  .rc{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--dim);word-break:break-all}
+  code{background:#1a2030;border-radius:5px;padding:1px 6px;font-size:13px}
+  pre{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow-x:auto;font-size:13px}
+  .btn{cursor:pointer;background:#12312c;border:1px solid var(--teal);color:var(--teal);border-radius:8px;padding:6px 12px;font-size:13px}
+  .note{border-left:3px solid var(--amber);background:#1a160b;padding:10px 14px;border-radius:0 10px 10px 0;margin:14px 0}
+  footer{color:var(--dim);font-size:13px;margin-top:36px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">Telegraph Hackathon Season II · Apps &amp; Agents · Missions 14 / 01 / 02</div>
+  <h1>Your agent is about to pay.<br>Who checked first?</h1>
+  <p class="sub">tgp-guard buys independent checks through Telegraph before an autonomous agent swaps, pays or clicks, and returns one verdict — <span class="allow">ALLOW</span> / <span class="hold">HOLD</span> / <span class="block">BLOCK</span> — with a receipt for every check. Testnet: Ethereum Sepolia, ~$0.01 per answer, hard-capped at $0.01 per payment.</p>
+  <div>
+    <span class="pill"><b>4 checks</b> · price · sanctions · link · contract audit</span>
+    <span class="pill"><b>9 paid answers</b> per full preflight · ~$0.09</span>
+    <span class="pill"><b>0 false ALLOWs</b> — fails closed, always</span>
+  </div>
+
+  <div class="cards">
+    <div class="card"><div class="n">3/3</div><div class="l">price sources agree within 0.01% (BTC, 11 Nov 2026)</div></div>
+    <div class="card"><div class="n">3/3</div><div class="l">sanctions voters clear "Acme Bakery" — incl. 4-list Counterproof</div></div>
+    <div class="card"><div class="n">3/3</div><div class="l">link voters CLEAN on github.com after a live vocabulary fix</div></div>
+    <div class="card"><div class="n" style="color:var(--red)">BLOCK</div><div class="l">"Laden": OFAC SDN + UN Consolidated listed · $50,000 quote vs $74,415 median (32.81% off-market)</div></div>
+  </div>
+
+  <h2>Watch it work — recorded live runs, 11 Nov 2026</h2>
+  <p class="dim">These are real paid Telegraph answers on Ethereum Sepolia testnet, replayed exactly as they ran. Receipt hashes are on the page so anyone can verify them. Nothing here is simulated.</p>
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-run="allow">Full preflight — ALLOW</button>
+    <button class="tab" data-run="laden">Sanctions — BLOCK ("Laden")</button>
+    <button class="tab" data-run="quote">Off-market quote — BLOCK</button>
+    <button class="tab" data-run="link">Link check — the break it caught</button>
+  </div>
+  <div class="term">
+    <div class="term-hd"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">tgp-guard — live terminal replay</span></div>
+    <div class="term-bd" id="term"></div>
+  </div>
+  <p><button class="btn" id="replay">Replay this run</button> <span class="dim" id="runmeta"></span></p>
+
+  <h2>The break it caught today</h2>
+  <p>On 11 Nov the third link voter (PREFLIGHT 20260828) silently changed its verdict word from <code>not_listed</code> to <code>Safe</code>. The classifier did not recognise it, so every link check failed closed to <span class="hold">HOLD</span>. That is the design working: a silent upstream change surfaced as a HOLD, never as a false ALLOW. The fix (accept <code>Safe</code> / <code>Clean</code> / <code>not_listed</code> as CLEAN) was re-verified live within the hour: 3/3 CLEAN ALLOW on github.com and example.com.</p>
+
+  <h2>Second opinion on sanctions</h2>
+  <p>Added 11 Nov: Counterproof miner 731002 screens US OFAC + UN + EU + UK lists in a single ask (<code>GET /screen</code>). Its fuzzy matcher can disagree with the exact-name list miners, and the disagreement is recorded, not hidden: "Laden" is <span class="block">BLOCK</span> on OFAC + UN, while Counterproof cleared it (confidence 0.207). A Counterproof-only signal <span class="hold">HOLDs</span> for human review and its CLEAR never overrides a list hit.</p>
+  <div class="note"><b>Honest limitation:</b> the Counterproof-only-hit HOLD path is code-reviewed but not yet live-tested — no EU/UK-only listed name was available to test against on 11 Nov. Sanctions screening is exact-name only; list coverage differs between miners.</div>
+
+  <h2>Reproduce it yourself</h2>
+  <pre>npm i
+echo "EVM_PRIVATE_KEY=0x&lt;burner testnet key&gt;" &gt; .env   # never a real wallet
+# Fund the burner on Ethereum Sepolia: a little Sepolia ETH for gas,
+# plus test USDC 0xcc194e1a843B658526D0D5C431f670028582Ae17 (open mint).
+node --env-file=.env preflight.mjs --asset bitcoin --counterparty "Acme Bakery" --url https://github.com
+node --env-file=.env preflight.mjs --counterparty "Laden"          # expect BLOCK
+node --env-file=.env guard.mjs bitcoin 50000                        # expect BLOCK (off-market)</pre>
+  <p>Full instructions, honest limitations and the jsonl logs with receipt hashes: <a href="https://github.com/georgeonweb3/tgp-guard">github.com/georgeonweb3/tgp-guard</a> · Demo video (2:23): <a href="https://github.com/georgeonweb3/tgp-guard/releases/download/v2-season2-demo/tgp-guard-demo.mp4">tgp-guard-demo.mp4</a></p>
+
+  <h2>Missions</h2>
+  <p><b>Mission 14 — Web3 Native and DeFi (primary):</b> analysis bought before committing capital, generalised — price, sanctions, link and contract-audit checks before any agent action, one verdict with receipts.</p>
+  <p><b>Mission 01 — Exchange:</b> the sanctions screen and multi-source price cross-check are the pre-listing / pre-trade evidence class, returned as one signed-off verdict with a cost line.</p>
+  <p><b>Mission 02 — Stablecoin:</b> compliance screening attached to the payment itself as proof — every verdict is backed by per-check Telegraph receipts, and x402 spend is hard-capped per payment ($0.01).</p>
+
+  <footer>tgp-guard by George Agbe (GitHub georgeonweb3, Discord cryptomillionaire9138, X @georgebuilding2). Testnet only — no production customers yet. Built for Telegraph Hackathon Season II.</footer>
+</div>
+<script>
+const RUNS = {
+allow: {meta: "Full preflight · 11 Nov 2026 · 9 paid answers · ~$0.09 · final ALLOW", text:
+`$ node --env-file=.env preflight.mjs --asset bitcoin --counterparty "Acme Bakery" --url https://github.com
+
+=== PREFLIGHT: ALLOW ===
+
+ALLOW  price check (bitcoin)
+       3/3 sources agree within 0.01%
+       receipt 0x942b5b526a5b8b96a77647b59038b3b7916c936f53c843d3123b036197a3d4db
+       receipt 0x1f2e35c02a80dc9ecc55ce8c7033e78cd985f36716ac7ebc9136cbd67e8ff058
+       receipt 0x300aa1a6a72a9d69a923d89b48856953b35f430c1d576a472ffeed918950d8d3
+ALLOW  sanctions screen ("Acme Bakery")
+       no match on any list for this exact name
+       receipt 0x6381cdfe55677b1a167049677051aa35d16ed070354fe0c7724871024881d9a6
+       receipt 0xac5abcac2683829e52e390432b50fb5e6e435a12ded79966f9f1c74c7167bbc9
+       receipt 0xbd75eeca6b86c7a8f922a9822128122c3d2a6c5166850e751385385080348bd6
+ALLOW  link check
+       no flags from 3/3 sources
+       receipt 0x308f75b619563889a1c0499239a339316c2dcb4f1373287fd00581e827d9c951
+       receipt 0xb678a1862c03e3af96ae4a177d7d568b327110b16ebc91f22144d39f43c56b83
+       receipt 0x239bb9c7da29af605d10a2b15d0e6d5bca5ade6e0afbcf1b019ea230311110e9
+
+total paid answers: 9  (~$0.09)`},
+laden: {meta: "Sanctions screen · 11 Nov 2026 · 3 paid answers · ~$0.03 · final BLOCK", text:
+`$ node --env-file=.env screen.mjs "Laden"
+
+"Laden"  =>  BLOCK
+listed on: OFAC SDN, UN Consolidated (Counterproof second opinion: CLEAR)
+
+OFAC SDN                     LISTED  receipt 0xdd8c6fd0a85d990f77471f15aa38e54a9f8297b3f6dbf230f347bb2f21d14efc
+UN Consolidated              LISTED  receipt 0x315477a7ded62323db1d74bc2baf4a04129e08b3505a0421692b4e2090dde42b
+Counterproof (US/UN/EU/UK)   no match  receipt 0xd5a5c42518161dbfec4f6fbb0d35cffb2ac8bc73dae64260ecd82bfaa030e351
+
+The disagreement is the point: Counterproof's fuzzy matcher cleared a bare
+name the exact-name lists hit. Its CLEAR never overrides a list hit.`},
+quote: {meta: "Price check · 11 Nov 2026 · 3 paid answers · ~$0.03 · final BLOCK", text:
+`$ node --env-file=.env guard.mjs bitcoin 50000
+
+BITCOIN  =>  BLOCK
+quoted 50000 is 32.81% off the median 74415.00
+median 74415.00  spread 0.163%  spent $0.03
+
+TxLens     74407.49     receipt 0x5c54fd3389c046acec19715fbce9705be21a464603cb140f412af7ddaa315b1b
+CoinGecko  74415        receipt 0x6be3663ad418df1a244ff37589d2595736dd285b9a4846d5e607a31e8a373231
+Kraken     74528.9      receipt 0x33f6fd23d8b4ad9db244e854c2aab0d3e2eec8b3db16051a793eac569e96282b`},
+link: {meta: "Link check · 11 Nov 2026 · the vocabulary drift, caught live", text:
+`$ node --env-file=.env urlcheck.mjs https://github.com
+# BEFORE the fix — third voter answers verdict="Safe",
+# the classifier only knew "not_listed":
+=> HOLD
+1 source(s) could not assess, cannot clear  spent $0.03
+
+Preflight    UNKNOWN  verdict=Safe
+URLSentinel  CLEAN    safe
+NetWire      CLEAN    safe=true risk=no_indicators_found
+
+# AFTER the fix — "Safe" is recognised as CLEAN:
+$ node --env-file=.env urlcheck.mjs https://github.com
+=> ALLOW
+no flags from 3/3 sources  spent $0.03
+
+Preflight    CLEAN    verdict=Safe  receipt 0x00851d5c793af80b2fed8deb23848feb889f8c165b45efcc4e41ed61f89c3b77
+URLSentinel  CLEAN    safe  receipt 0x13ba355a97ebf73212b1ca9a4025eb81fc5c751e31106e3630ba10ca84c942cf
+NetWire      CLEAN    safe=true risk=no_indicators_found  receipt 0x73af35d6f31a8e7d1e0bb6cfff59706c1d881802404f94d44b75978625c061fe`}
+};
+const term = document.getElementById('term'), meta = document.getElementById('runmeta');
+let timer = null, current = 'allow';
+function play(key){
+  current = key;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.run === key));
+  const r = RUNS[key]; meta.textContent = r.meta;
+  const lines = r.text.split('\n'); term.textContent = ''; let i = 0;
+  clearInterval(timer);
+  timer = setInterval(() => {
+    if (i >= lines.length) { clearInterval(timer); return; }
+    term.textContent += (i ? '\n' : '') + lines[i]; i++;
+  }, 34);
+}
+document.getElementById('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (b) play(b.dataset.run); });
+document.getElementById('replay').addEventListener('click', () => play(current));
+play('allow');
+</script>
+</body>
+</html>

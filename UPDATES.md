@@ -26,6 +26,18 @@ Also in: Telegraph 10,000 member #124, Hacker role held. Build in public, prove 
 
 ---
 
+## Update 2 (X thread — drafted 2026-11-11, for George to post from his phone)
+
+**1/**
+The guard caught a real break today. My third link-scan voter silently changed its verdict word, and every link check failed closed to HOLD. Fixed and re-verified live within the hour. A silent upstream change surfaced as a HOLD, never as a false ALLOW. @Telegraphprotoc
+
+**2/**
+Sanctions now has a second opinion: Counterproof screens US/UN/EU/UK in one ask. It cleared "Laden" while OFAC + UN listed it — the disagreement is recorded in the verdict, and a CLEAR never overrides a list hit.
+https://github.com/georgeonweb3/tgp-guard
+
+**3/**
+Fresh tonight: full preflight ALLOW, 9 paid answers, ~$0.09. The showcase thread is up in the Telegraph Discord. (Telegraph Hackathon Season II prize entry)
+
 ## Discord milestone post (#hackers / milestone channel, before Nov 14)
 
 **First Integration Milestone — tgp-guard (Apps & Agents, Missions 14 / 01 / 02)**
