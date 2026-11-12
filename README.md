@@ -9,6 +9,8 @@ Network: Ethereum Sepolia testnet (eip155:11155111), x402, ~$0.01 per answer, vi
 > Update (2026-11-11): the third link voter's verdict vocabulary drifted ("Safe" instead of "not_listed") and briefly turned every link check into a HOLD — fixed the same day in urlcheck.mjs, re-verified live (3/3 CLEAN ALLOW on github.com and example.com). The sanctions screen gained a second-opinion voter the same day: Counterproof 731002 screens US OFAC + UN + EU + UK lists in one ask (GET /screen); a Counterproof-only signal HOLDs for human review and never overrides an OFAC/UN hit. Fresh full-preflight ALLOW re-verified 2026-11-11: 9 paid answers, ~$0.09.
 >
 > Update (2026-11-12): the Counterproof-only HOLD path is now live-tested. "Roman Abramovich" — listed on the EU and UK lists only (verified at EUR-Lex and OFSI; absent from the OFAC SDN and UN Consolidated lists downloaded the same day) — returned HOLD: Counterproof REVIEW while OFAC + UN both cleared. Full record: evidence/counterproof-hold-2026-11-12.md.
+>
+> Demo video v2 (1:19, 2026-11-12, Unlisted): https://www.youtube.com/watch?v=iQyJggyLHXM — the interactive demo in action (Laden BLOCK, Abramovich HOLD proof, cost math). Interactive demo: https://georgeonweb3.github.io/tgp-guard/
 
 ## Checks (each fires multiple independent miners and compares)
 | Check | Intent | Miners | Rule |

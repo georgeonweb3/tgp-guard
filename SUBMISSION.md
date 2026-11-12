@@ -56,6 +56,8 @@ Full instructions in README.md, including honest limitations.
 ## Demo (to record before Dec 1)
 2–5 min screen recording script: run the happy-path four-check preflight (price + sanctions + link + contract audit, all ALLOW), then the "Laden" BLOCK, then the off-market-quote BLOCK; show one evidence/*.jsonl entry and its receipt hashes; close with the spend total.
 
+**Demo video v2 (1:19, 2026-11-12, Unlisted):** https://www.youtube.com/watch?v=iQyJggyLHXM — the interactive demo in action (Laden BLOCK, Abramovich HOLD proof, cost math).
+
 ## Milestones
 - **Nov 14 First Integration Milestone:** already satisfied in substance — first working Telegraph purchases made 2026-11-03 with receipts in evidence/season2-refresh/. Share in Discord before Nov 14.
 - **Dec 1, 23:59 UTC:** final submission through the H2 website with this document's fields, the demo video, and showcase permissions.
