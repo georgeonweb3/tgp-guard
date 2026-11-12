@@ -42,6 +42,12 @@ address and an optional --chain (ethereum default; also bsc, base, arbitrum, pol
     node --env-file=.env audit.mjs 0xdAC17F958D2ee523a2206206994597C13D831ec7
 Raw paid call helper: ask.mjs. Logs: evidence/*.jsonl.
 
+## MCP server
+`mcp-server/` exposes the same checks as MCP tools over stdio (`price_check`, `sanctions_screen`,
+`link_scan`, `full_preflight`) for clients like Claude Desktop — same verdicts and receipts, $0.01
+per paid answer on Sepolia, burner wallet required. Setup and tool list: `mcp-server/README.md`.
+Live smoke test (2026-11-12, all four tools ALLOW, 12 paid answers): `mcp-server/SMOKE-TEST.md`.
+
 ## Privacy
 tgp-guard has no accounts and collects nothing in the background. Each check is a single per-request ask, and it sends only the minimum that check needs — a name for a sanctions screen, a URL for a link scan, a quote for a price check, a contract address for an audit — to the Telegraph miners performing that check, and nothing else. No account is ever created or stored, and run history lives only in the local run log (`evidence/*.jsonl`) that you control. One honest caveat: the miners are third parties, so do not scan a private URL or a name you would not want a checker to see.
 

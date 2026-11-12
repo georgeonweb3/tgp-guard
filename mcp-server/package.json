@@ -1,0 +1,15 @@
+{
+  "name": "tgp-guard-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for tgp-guard: pre-flight guard for autonomous agents (Telegraph, Sepolia testnet)",
+  "type": "module",
+  "bin": { "tgp-guard-mcp": "./server.mjs" },
+  "scripts": { "start": "node server.mjs", "smoke": "node smoke-test.mjs" },
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@x402/evm": "^2.28.0",
+    "@x402/fetch": "^2.28.0",
+    "viem": "^2.57.11"
+  }
+}
