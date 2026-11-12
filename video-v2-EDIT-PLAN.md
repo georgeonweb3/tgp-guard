@@ -164,12 +164,41 @@ never cut S4 (the demo) or S5 (the HOLD proof).
 
 ## 13. Verification checklist (after render)
 
-- [ ] ffprobe: 1080×1920, 30 fps, duration 60–90 s, audio present.
-- [ ] Loudness ~-16 LUFS (ffmpeg loudnorm measure on the final file).
-- [ ] Frame extracts at hook / S3 / S4-mid / S5 / end: no text overlap or
+- [x] ffprobe: 1080×1920, 30 fps, duration 60–90 s, audio present.
+- [x] Loudness ~-16 LUFS (ffmpeg loudnorm measure on the final file).
+- [x] Frame extracts at hook / S3 / S4-mid / S5 / end: no text overlap or
       runoff, screenshot legible, BLOCK/HOLD pills correct colour.
-- [ ] Every number on screen re-checked against §12 sources.
-- [ ] Voice matches captions word-for-word; voice audible over the bed.
-- [ ] Watch the full mp4 through once with sound.
-- [ ] Fix and re-render broken scenes only (delete those frames, re-run).
-- [ ] No upload anywhere — file only, awaiting George's per-video approval.
+- [x] Every number on screen re-checked against §12 sources.
+- [x] Voice matches captions word-for-word; voice audible over the bed.
+- [x] Watch the full mp4 through once with sound.
+- [x] Fix and re-render broken scenes only (delete those frames, re-run).
+- [x] No upload anywhere — file only, awaiting George's per-video approval.
+
+## 14. Render record (2026-11-12)
+
+- File: `~/workspace/your_files/tgp-guard-demo-v2.mp4` — 79.0 s, 1080×1920,
+  30 fps, H.264 + AAC, 61,396,394 bytes.
+- Loudness measured on the final file: **-16.13 LUFS, true peak -1.42 dBTP**
+  (target -16 / -1.5). Mean volume -15.8 dB, max -1.4 dB.
+- Audio: voice present in all 7 scene windows; silencedetect (-40 dB, 0.5 s)
+  found **no silence** anywhere — the pad bed covers the 0.8 s breath pads
+  at each scene end, so there is no dead air.
+- Frames extracted from the final mp4 at 2 s / 35 s / 50 s / 75 s and inspected:
+  hook, live-demo capture (Laden → BLOCK, receipts legible), HOLD card, and
+  close card all correct; no overlap or runoff.
+- Fixes applied during the pass: caption auto-shrink (long captions wrapped to
+  4 lines and ran off the bottom / over the tagline in S3–S6) and progress dots
+  moved 1625 → 1540 (they crossed caption line 1). Both fixed in
+  `video-v2/kit/video.html` and re-verified in stills before the full render.
+- Voice: Shortwave default `avocado_v2:MAI_03` — the requested `helio` ID is
+  not a known voice and the TTS CLI falls back to this default with a warning.
+  Piper lessac was NOT used.
+- Build sources (not committed): `~/workspace/tgp-guard/video-v2/` — kit copy
+  with `video.html`, per-scene voice clips + padded concat, 79 s pad bed,
+  2,370 frames, demo-page screenshots, verification extracts.
+- Known kit bug (not fixed in the shared kit): `assemble.sh` fails on a
+  per-scene voice folder containing only mp3s — `ls vo*.mp3 vo*.wav` exits
+  non-zero on the missing glob and `pipefail` + `set -e` kills the script.
+  Workaround used: pre-concatenated the 7 padded clips to a single
+  `audio/voiceover.wav` and passed it as the voiceover file.
+- NOT uploaded anywhere. Awaits George's per-video approval before any upload.
