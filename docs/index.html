@@ -124,7 +124,7 @@ node --env-file=.env preflight.mjs --asset bitcoin --counterparty "Acme Bakery" 
 
   <h2>Second opinion on sanctions</h2>
   <p>Added 11 Nov: Counterproof miner 731002 screens US OFAC + UN + EU + UK lists in a single ask (<code>GET /screen</code>). Its fuzzy matcher can disagree with the exact-name list miners, and the disagreement is recorded, not hidden: "Laden" is <span class="block">BLOCK</span> on OFAC + UN, while Counterproof cleared it (confidence 0.207). A Counterproof-only signal <span class="hold">HOLDs</span> for human review and its CLEAR never overrides a list hit.</p>
-  <div class="note"><b>Honest limitation:</b> the Counterproof-only-hit HOLD path is code-reviewed but not yet live-tested — no EU/UK-only listed name was available to test against on 11 Nov. Sanctions screening is exact-name only; list coverage differs between miners.</div>
+  <div class="note"><b>Live-tested 12 Nov:</b> the Counterproof-only-hit HOLD path now has a real run — "Roman Abramovich" (listed on EU + UK lists only, clear on OFAC + UN) returned <span class="hold">HOLD</span> on a Counterproof REVIEW, receipts in <code>evidence/counterproof-hold-2026-11-12.md</code>. Sanctions screening is exact-name only; list coverage differs between miners.</div>
 
   <h2 id="repro">Reproduce it yourself</h2>
   <pre>npm i
