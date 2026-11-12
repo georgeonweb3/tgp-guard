@@ -36,6 +36,24 @@
   pre{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;overflow-x:auto;font-size:13px}
   .btn{cursor:pointer;background:#12312c;border:1px solid var(--teal);color:var(--teal);border-radius:8px;padding:6px 12px;font-size:13px}
   .note{border-left:3px solid var(--amber);background:#1a160b;padding:10px 14px;border-radius:0 10px 10px 0;margin:14px 0}
+  .ibox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin:14px 0}
+  .badge{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;letter-spacing:.03em}
+  .badge-rec{background:#1a2030;color:var(--amber);border:1px solid #3a2f10}
+  .badge-live{background:#0d2b23;color:var(--green);border:1px solid #14532d}
+  .field{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  select,input[type=text]{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:9px 12px;font-size:14px}
+  select{max-width:260px} input[type=text]{flex:1;min-width:220px;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip{cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--txt);border-radius:999px;padding:5px 12px;font-size:13px}
+  .chip:hover{border-color:var(--teal);color:var(--teal)}
+  .step{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14px}
+  .step .who{font-weight:700}
+  .verdict{border-radius:10px;padding:12px 14px;margin:12px 0;font-weight:700;font-size:16px}
+  .verdict.allow{background:#0d2b23;color:var(--green)}
+  .verdict.block{background:#2b0d0d;color:var(--red)}
+  .verdict.hold{background:#2b220d;color:var(--amber)}
+  .livegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:10px 0}
+  .livecell .n{font-size:24px;font-weight:800}
+  .livecell .l{color:var(--dim);font-size:13px}
   footer{color:var(--dim);font-size:13px;margin-top:36px;border-top:1px solid var(--line);padding-top:14px}
 </style>
 </head>
@@ -71,6 +89,36 @@
   </div>
   <p><button class="btn" id="replay">Replay this run</button> <span class="dim" id="runmeta"></span></p>
 
+  <h2>Try it yourself — interactive replay</h2>
+  <p><span class="badge badge-rec">RECORDED REPLAY</span> Pick a check and an input below. The page plays back the <b>real paid run</b> for that exact input, step by step, with the receipt hashes from <code>evidence/*.jsonl</code> in the repo. Nothing is re-run and nothing is simulated: this is a static GitHub Pages site with no backend and no judge wallet, so a live paid preflight cannot happen in your browser. An input with no recorded run gets no verdict — pick a preset.</p>
+  <div class="ibox">
+    <form id="iform">
+      <label for="itype"><b>Check</b></label>
+      <div class="field">
+        <select id="itype">
+          <option value="sanctions">Sanctions name check</option>
+          <option value="link">Link URL check</option>
+          <option value="quote">Quote / off-market check (bitcoin)</option>
+        </select>
+        <input type="text" id="ivalue" value="Acme Bakery" autocomplete="off" spellcheck="false" aria-label="Input to check">
+        <button class="btn" type="submit" style="padding:9px 16px">Run recorded check</button>
+      </div>
+    </form>
+    <p class="dim" style="margin:4px 0">Presets with a recorded run: <span id="chips"></span></p>
+    <div id="iout" aria-live="polite"></div>
+  </div>
+
+  <h3>Live check — Bitcoin price right now <span class="badge badge-live">LIVE</span></h3>
+  <p class="dim">The one check that needs no payment: a free public CoinGecko price, fetched live in your browser, compared with the <b>recorded</b> miner median from 11 Nov 2026. If the fetch fails, this box says so — it never shows old data as live.</p>
+  <div class="ibox" id="livebox">Fetching live BTC price from CoinGecko…</div>
+  <p><button class="btn" id="liverefresh">Refresh live price</button></p>
+
+  <h3>Run it yourself — the real thing</h3>
+  <pre>git clone https://github.com/georgeonweb3/tgp-guard.git
+cd tgp-guard &amp;&amp; npm i
+node --env-file=.env preflight.mjs --asset bitcoin --counterparty "Acme Bakery" --url https://github.com</pre>
+  <p class="dim">Needs a burner key on Ethereum Sepolia testnet in <code>.env</code> (never a real wallet) — full setup in the <a href="#repro">Reproduce it yourself</a> section below.</p>
+
   <h2>The break it caught today</h2>
   <p>On 11 Nov the third link voter (PREFLIGHT 20260828) silently changed its verdict word from <code>not_listed</code> to <code>Safe</code>. The classifier did not recognise it, so every link check failed closed to <span class="hold">HOLD</span>. That is the design working: a silent upstream change surfaced as a HOLD, never as a false ALLOW. The fix (accept <code>Safe</code> / <code>Clean</code> / <code>not_listed</code> as CLEAN) was re-verified live within the hour: 3/3 CLEAN ALLOW on github.com and example.com.</p>
 
@@ -78,7 +126,7 @@
   <p>Added 11 Nov: Counterproof miner 731002 screens US OFAC + UN + EU + UK lists in a single ask (<code>GET /screen</code>). Its fuzzy matcher can disagree with the exact-name list miners, and the disagreement is recorded, not hidden: "Laden" is <span class="block">BLOCK</span> on OFAC + UN, while Counterproof cleared it (confidence 0.207). A Counterproof-only signal <span class="hold">HOLDs</span> for human review and its CLEAR never overrides a list hit.</p>
   <div class="note"><b>Honest limitation:</b> the Counterproof-only-hit HOLD path is code-reviewed but not yet live-tested — no EU/UK-only listed name was available to test against on 11 Nov. Sanctions screening is exact-name only; list coverage differs between miners.</div>
 
-  <h2>Reproduce it yourself</h2>
+  <h2 id="repro">Reproduce it yourself</h2>
   <pre>npm i
 echo "EVM_PRIVATE_KEY=0x&lt;burner testnet key&gt;" &gt; .env   # never a real wallet
 # Fund the burner on Ethereum Sepolia: a little Sepolia ETH for gas,
@@ -177,6 +225,141 @@ function play(key){
 document.getElementById('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (b) play(b.dataset.run); });
 document.getElementById('replay').addEventListener('click', () => play(current));
 play('allow');
+</script>
+<script>
+// Interactive replay — every receipt hash and number below is copied from
+// evidence/*.jsonl (recorded paid Telegraph runs, 11 Nov 2026). Nothing here
+// is invented, and no input without a recorded run gets a verdict.
+const SCEN = {
+sanctions: {label: 'Sanctions name check', presets: ['Acme Bakery', 'Laden'], runs: {
+  'acme bakery': {cmd: '$ node --env-file=.env screen.mjs "Acme Bakery"', ts: '2026-11-11T20:17:37Z', file: 'evidence/screen-log.jsonl', verdict: 'ALLOW', vclass: 'allow', cost: '$0.03 · 3 paid answers', note: 'Name-only screening, not full KYC.',
+    steps: [
+      {who: 'OFAC SDN', res: 'CLEAR — no match for this exact name', rc: '0x6381cdfe55677b1a167049677051aa35d16ed070354fe0c7724871024881d9a6'},
+      {who: 'UN Consolidated', res: 'CLEAR — no match for this exact name', rc: '0xac5abcac2683829e52e390432b50fb5e6e435a12ded79966f9f1c74c7167bbc9'},
+      {who: 'Counterproof (US/UN/EU/UK)', res: 'CLEAR — no match', rc: '0xbd75eeca6b86c7a8f922a9822128122c3d2a6c5166850e751385385080348bd6'}]},
+  'laden': {cmd: '$ node --env-file=.env screen.mjs "Laden"', ts: '2026-11-11T20:16:40Z', file: 'evidence/screen-log.jsonl', verdict: 'BLOCK', vclass: 'block', cost: '$0.03 · 3 paid answers', note: 'Listed on OFAC SDN + UN Consolidated. Counterproof cleared it (confidence 0.207) — its CLEAR never overrides a list hit.',
+    steps: [
+      {who: 'OFAC SDN', res: 'LISTED', rc: '0xdd8c6fd0a85d990f77471f15aa38e54a9f8297b3f6dbf230f347bb2f21d14efc'},
+      {who: 'UN Consolidated', res: 'LISTED', rc: '0x315477a7ded62323db1d74bc2baf4a04129e08b3505a0421692b4e2090dde42b'},
+      {who: 'Counterproof (US/UN/EU/UK)', res: 'CLEAR — no match (second opinion only)', rc: '0xd5a5c42518161dbfec4f6fbb0d35cffb2ac8bc73dae64260ecd82bfaa030e351'}]}
+}},
+link: {label: 'Link URL check', presets: ['https://github.com', 'https://github.com (before the fix)', 'https://example.com'], runs: {
+  'https://github.com': {cmd: '$ node --env-file=.env urlcheck.mjs https://github.com', ts: '2026-11-11T20:17:42Z', file: 'evidence/url-log.jsonl', verdict: 'ALLOW', vclass: 'allow', cost: '$0.03 · 3 paid answers', note: 'After the vocabulary fix: "Safe" recognised as CLEAN.',
+    steps: [
+      {who: 'Preflight', res: 'CLEAN — verdict=Safe', rc: '0x308f75b619563889a1c0499239a339316c2dcb4f1373287fd00581e827d9c951'},
+      {who: 'URLSentinel', res: 'CLEAN — safe', rc: '0xb678a1862c03e3af96ae4a177d7d568b327110b16ebc91f22144d39f43c56b83'},
+      {who: 'NetWire', res: 'CLEAN — safe=true, risk=no_indicators_found', rc: '0x239bb9c7da29af605d10a2b15d0e6d5bca5ade6e0afbcf1b019ea230311110e9'}]},
+  'https://github.com (before the fix)': {cmd: '$ node --env-file=.env urlcheck.mjs https://github.com  # before the fix', ts: '2026-11-11T20:11:41Z', file: 'evidence/url-log.jsonl', verdict: 'HOLD', vclass: 'hold', cost: '$0.03 · 3 paid answers', note: 'Third voter answered verdict="Safe", which the classifier did not recognise — failed closed to HOLD. This is the break the page documents.',
+    steps: [
+      {who: 'Preflight', res: 'UNKNOWN — verdict=Safe (not recognised)', rc: '0xa8ee70069159cc45d3b37a56155c5f358321ae70186c9cc9ce44f6a28be7da39'},
+      {who: 'URLSentinel', res: 'CLEAN — safe', rc: '0xa1fce56dc16e4816154ed7f9a932f2784fdc5ea0d0cc34f79f87500095764925'},
+      {who: 'NetWire', res: 'CLEAN — safe=true, risk=no_indicators_found', rc: '0x3cff2602ddf6bf2148861a5f6e8269da075917db4a57a6f64bbba25098daca92'}]},
+  'https://example.com': {cmd: '$ node --env-file=.env urlcheck.mjs https://example.com', ts: '2026-11-11T20:13:03Z', file: 'evidence/url-log.jsonl', verdict: 'ALLOW', vclass: 'allow', cost: '$0.03 · 3 paid answers', note: 'No flags from 3/3 sources.',
+    steps: [
+      {who: 'Preflight', res: 'CLEAN — verdict=Safe', rc: '0xca5876232166caf518d0326cdbd8c809778de166e38ac045a9543bf5fdfd75a7'},
+      {who: 'URLSentinel', res: 'CLEAN — safe', rc: '0x8d7c584197dcab507e76f19b4052f8dc37ddc8252341575293c20f090d2c8e4b'},
+      {who: 'NetWire', res: 'CLEAN — safe=true, risk=no_indicators_found', rc: '0xfd061feba45dedbeb05bd6a3573436cf82afc6c6f2b151daced8ac559e117232'}]}
+}},
+quote: {label: 'Quote / off-market check (bitcoin)', presets: ['$50,000', '$74,400', 'no quote (median only)'], runs: {
+  '$50,000': {cmd: '$ node --env-file=.env guard.mjs bitcoin 50000', ts: '2026-11-11T20:14:02Z', file: 'evidence/guard-log.jsonl', verdict: 'BLOCK', vclass: 'block', cost: '$0.03 · 3 paid answers', note: 'Quoted $50,000 is 32.81% off the median $74,415.00 (spread 0.163%).',
+    steps: [
+      {who: 'TxLens', res: '$74,407.49', rc: '0x5c54fd3389c046acec19715fbce9705be21a464603cb140f412af7ddaa315b1b'},
+      {who: 'CoinGecko', res: '$74,415', rc: '0x6be3663ad418df1a244ff37589d2595736dd285b9a4846d5e607a31e8a373231'},
+      {who: 'Kraken', res: '$74,528.90', rc: '0x33f6fd23d8b4ad9db244e854c2aab0d3e2eec8b3db16051a793eac569e96282b'}]},
+  '$74,400': {cmd: '$ node --env-file=.env guard.mjs bitcoin 74400', ts: '2026-11-11T20:22:01Z', file: 'evidence/guard-log.jsonl', verdict: 'ALLOW', vclass: 'allow', cost: '$0.03 · 3 paid answers', note: 'Quoted $74,400 is 0.07% off the median $74,454.20 (spread 0.013%).',
+    steps: [
+      {who: 'TxLens', res: '$74,462.74', rc: '0x28ff30c31c61d3bb52894e4d66383280644a184217954b347df82ab13fae1c5f'},
+      {who: 'CoinGecko', res: '$74,453', rc: '0x75b907ceb45a196737213e9e49bb3c22153bde4c83247f85f1b1dd6f5acb1669'},
+      {who: 'Kraken', res: '$74,454.20', rc: '0x3ae1f980ab080ee82d3f72645fb38a19b47c6778379eebccf89169bbba9c6327'}]},
+  'no quote (median only)': {cmd: '$ node --env-file=.env guard.mjs bitcoin', ts: '2026-11-11T20:17:38Z', file: 'evidence/guard-log.jsonl', verdict: 'ALLOW', vclass: 'allow', cost: '$0.03 · 3 paid answers', note: '3/3 sources agree within 0.01% — median $74,524.00.',
+    steps: [
+      {who: 'TxLens', res: '$74,528.68', rc: '0x942b5b526a5b8b96a77647b59038b3b7916c936f53c843d3123b036197a3d4db'},
+      {who: 'CoinGecko', res: '$74,524', rc: '0x1f2e35c02a80dc9ecc55ce8c7033e78cd985f36716ac7ebc9136cbd67e8ff058'},
+      {who: 'Kraken', res: '$74,519', rc: '0x300aa1a6a72a9d69a923d89b48856953b35f430c1d576a472ffeed918950d8d3'}]}
+}}
+};
+const itype = document.getElementById('itype'), ivalue = document.getElementById('ivalue'),
+      chips = document.getElementById('chips'), iout = document.getElementById('iout');
+let itimer = null;
+function renderChips(){
+  const s = SCEN[itype.value];
+  chips.innerHTML = '';
+  s.presets.forEach(p => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = p;
+    b.addEventListener('click', () => { ivalue.value = p; runInteractive(); });
+    chips.appendChild(b); chips.appendChild(document.createTextNode(' '));
+  });
+}
+function stepEl(st){
+  const d = document.createElement('div'); d.className = 'step';
+  const w = document.createElement('div'); w.className = 'who'; w.textContent = st.who;
+  const r = document.createElement('div'); r.textContent = st.res;
+  const c = document.createElement('div'); c.className = 'rc'; c.textContent = 'receipt ' + st.rc;
+  d.append(w, r, c); return d;
+}
+function runInteractive(){
+  clearInterval(itimer);
+  const type = itype.value, raw = ivalue.value.trim();
+  const run = SCEN[type].runs[raw.toLowerCase()] || SCEN[type].runs[raw];
+  iout.innerHTML = '';
+  if (!run){
+    const d = document.createElement('div'); d.className = 'note';
+    d.innerHTML = '<b>No recorded run for that input.</b> This page only replays runs actually recorded on 11 Nov 2026 — it does not simulate a verdict. Pick a preset above.';
+    iout.appendChild(d); return;
+  }
+  const badge = document.createElement('p');
+  badge.innerHTML = '<span class="badge badge-rec">RECORDED REPLAY</span> <span class="dim">' + run.ts + ' · ' + run.file + ' · ' + run.cost + '</span>';
+  const cmd = document.createElement('pre'); cmd.textContent = run.cmd;
+  iout.append(badge, cmd);
+  const queue = run.steps.slice(); let i = 0;
+  itimer = setInterval(() => {
+    if (i >= queue.length){
+      clearInterval(itimer);
+      const v = document.createElement('div'); v.className = 'verdict ' + run.vclass;
+      v.textContent = '=== ' + SCEN[type].label.toUpperCase() + ': ' + run.verdict + ' ===';
+      const n = document.createElement('p'); n.className = 'dim'; n.textContent = run.note;
+      iout.append(v, n); return;
+    }
+    iout.appendChild(stepEl(queue[i])); i++;
+  }, 450);
+}
+document.getElementById('iform').addEventListener('submit', e => { e.preventDefault(); runInteractive(); });
+itype.addEventListener('change', () => { ivalue.value = SCEN[itype.value].presets[0]; renderChips(); runInteractive(); });
+renderChips();
+// Live price check — free CoinGecko public endpoint, no payment, no wallet.
+// Recorded reference: BTC miner median $74,415.00, guard-log 2026-11-11T20:14:02Z.
+const RECORDED_MEDIAN = 74415.00;
+async function livePrice(){
+  const box = document.getElementById('livebox');
+  box.innerHTML = 'Fetching live BTC price from CoinGecko…';
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 10000);
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', {signal: ctrl.signal});
+    clearTimeout(t);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    const p = j && j.bitcoin && j.bitcoin.usd;
+    if (typeof p !== 'number') throw new Error('no price in response');
+    const diff = (p - RECORDED_MEDIAN) / RECORDED_MEDIAN * 100;
+    const when = new Date().toLocaleString();
+    const sign = diff >= 0 ? '+' : '';
+    box.innerHTML =
+      '<span class="badge badge-live">LIVE</span> <span class="dim">fetched ' + when + ' from api.coingecko.com (free public endpoint)</span>' +
+      '<div class="livegrid">' +
+      '<div class="livecell"><div class="n">$' + p.toLocaleString('en-US') + '</div><div class="l">BTC/USD — live right now</div></div>' +
+      '<div class="livecell"><div class="n">$74,415.00</div><div class="l">RECORDED miner median — 11 Nov 2026, 20:14 UTC (evidence/guard-log.jsonl)</div></div>' +
+      '<div class="livecell"><div class="n">' + sign + diff.toFixed(2) + '%</div><div class="l">live price vs recorded median</div></div>' +
+      '</div>' +
+      '<p class="dim" style="margin:6px 0 0">Live price moves — the recorded median is a snapshot from 11 Nov, not a live quote. A live paid preflight would re-buy all three miner prices; this free check only shows where BTC trades now.</p>';
+  } catch (e) {
+    box.innerHTML = '<b>Live check unavailable right now.</b> CoinGecko did not answer (' + (e && e.message ? e.message : 'fetch failed') + '). The recorded median below is from 11 Nov 2026 — it is <b>not</b> live data.<br><span class="dim">Recorded miner median (11 Nov 2026, 20:14 UTC): $74,415.00 · evidence/guard-log.jsonl. Press “Refresh live price” to try again.</span>';
+  }
+}
+document.getElementById('liverefresh').addEventListener('click', livePrice);
+livePrice();
+runInteractive();
 </script>
 </body>
 </html>
