@@ -42,6 +42,9 @@ address and an optional --chain (ethereum default; also bsc, base, arbitrum, pol
     node --env-file=.env audit.mjs 0xdAC17F958D2ee523a2206206994597C13D831ec7
 Raw paid call helper: ask.mjs. Logs: evidence/*.jsonl.
 
+## Privacy
+tgp-guard has no accounts and collects nothing in the background. Each check is a single per-request ask, and it sends only the minimum that check needs — a name for a sanctions screen, a URL for a link scan, a quote for a price check, a contract address for an audit — to the Telegraph miners performing that check, and nothing else. No account is ever created or stored, and run history lives only in the local run log (`evidence/*.jsonl`) that you control. One honest caveat: the miners are third parties, so do not scan a private URL or a name you would not want a checker to see.
+
 ## Limitations (honest)
 - Testnet only; no production traffic or customer adoption.
 - Sanctions check is exact-name only; OFAC lists "LAZARUS GROUP" but the UN miner did not, so list coverage differs. The Counterproof second opinion (added 2026-11-11) uses fuzzy matching across four lists and can disagree with the exact-name miners: live 2026-11-11 it cleared "Laden" (confidence 0.207) while OFAC + UN both listed it. A Counterproof-only signal therefore HOLDs for human review instead of BLOCKing, and its CLEAR never overrides an OFAC/UN hit. The Counterproof-only HOLD path was live-tested 2026-11-12: "Roman Abramovich" (EU + UK listed only) returned HOLD on a Counterproof REVIEW with OFAC + UN clear (evidence/counterproof-hold-2026-11-12.md).

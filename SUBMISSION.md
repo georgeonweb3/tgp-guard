@@ -60,6 +60,13 @@ Full instructions in README.md, including honest limitations.
 - **Nov 14 First Integration Milestone:** already satisfied in substance — first working Telegraph purchases made 2026-11-03 with receipts in evidence/season2-refresh/. Share in Discord before Nov 14.
 - **Dec 1, 23:59 UTC:** final submission through the H2 website with this document's fields, the demo video, and showcase permissions.
 
+## Privacy
+tgp-guard has no accounts and collects nothing in the background. Each check is a single per-request ask, and it sends only the minimum that check needs — a name for a sanctions screen, a URL for a link scan, a quote for a price check, a contract address for an audit — to the Telegraph miners performing that check, and nothing else. No account is ever created or stored, and run history lives only in the local run log (`evidence/*.jsonl`) that you control. One honest caveat: the miners are third parties, so do not scan a private URL or a name you would not want a checker to see.
+
+## Anjoman listing status
+- Listing: https://anjoman.ai/dashboard/apps/mine/87a25a1c-31d5-41e3-9906-462152567cae (live-app link https://georgeonweb3.github.io/tgp-guard/ added via Edit on 2026-11-11; status was "In review" on 2026-11-11).
+- anjoman status (checked 2026-11-12): still to verify in a signed-in browser. A plain text fetch of the dashboard page returns only the generic edit-page header and no review status, and no public listing was found in search. Not claimed as approved or public.
+
 ## Limitations (honest)
 - Testnet only; no production traffic or customer adoption yet.
 - Link check has 3 live voters again (PREFLIGHT 20260828 replaced the retired ProofGate on 2026-11-03), but one of PREFLIGHT's own upstreams (URLhaus) reported unavailable in its answers; if PREFLIGHT leaves the network the check fails closed to HOLD again.
