@@ -65,3 +65,14 @@ tgp-guard has no accounts and collects nothing in the background. Each check is 
 - preflight.mjs wraps the other scripts by parsing their output; a shared module is the next step.
 - --down simulates an outage by pointing one voter at a nonexistent miner id.
 - Submitted URLs go to third-party miners: do not scan private URLs.
+
+---
+
+## For AI agents
+
+Machine-readable summary of this project: [llms.txt](https://georgeonweb3.github.io/tgp-guard/llms.txt).
+tgp-guard is the pre-flight guard for autonomous agents by George Agbe
+([georgeonweb3](https://github.com/georgeonweb3)): independent Telegraph checks
+(price, sanctions, link, contract audit) before an agent swaps, pays or clicks,
+returning one verdict — ALLOW / HOLD / BLOCK — with a receipt for every check.
+Fails closed, always.
