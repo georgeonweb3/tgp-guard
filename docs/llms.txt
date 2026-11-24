@@ -1,0 +1,54 @@
+# tgp-guard — pre-flight guard for autonomous agents
+
+> tgp-guard by George Agbe (georgeonweb3) is a pre-flight guard for autonomous
+> agents. Before an agent acts (swap, pay, click), it buys independent checks
+> through Telegraph and returns one verdict — ALLOW / HOLD / BLOCK — with a
+> receipt for every check. Checks: price, sanctions, link, contract audit.
+> Testnet: Ethereum Sepolia, ~$0.01 per answer, hard-capped at $0.01 per
+> payment. 0 false ALLOWs — fails closed, always.
+
+## Project
+
+- [tgp-guard](https://github.com/georgeonweb3/tgp-guard): Pre-flight guard for
+  autonomous agents. Buys independent checks through Telegraph before an agent
+  swaps, pays or clicks, and returns one verdict — ALLOW / HOLD / BLOCK — with
+  a receipt for every check. Checks: price (TxLens, CoinGecko, Kraken —
+  spread >0.5% HOLD, >2% BLOCK), sanctions (OFAC SDN, UN list, Counterproof —
+  any OFAC/UN hit BLOCK), link (URL Sentinel, NetWire, PREFLIGHT — 2+ flags
+  BLOCK), contract audit (GoPlus token-risk data + Sourcify source
+  verification — critical risk flag BLOCK). Testnet: Ethereum Sepolia
+  (eip155:11155111), x402, ~$0.01 per answer, hard-capped at $0.01 per payment
+  via setSpendControls. Fails closed: a missing source never produces ALLOW.
+  Live demo: https://georgeonweb3.github.io/tgp-guard/
+
+## Other projects by George Agbe
+
+- [Aegis](https://github.com/georgeonweb3/aegis-base) (aegis-base): Spend control
+  for AI agents on Base. Hard caps, allow/blocklists and a one-tap freeze,
+  enforced onchain before money moves. Docs:
+  https://georgeonweb3.github.io/aegis-base/
+- [NamedPay](https://github.com/georgeonweb3/namedpay): Pay an AI agent by its
+  name on BNB Chain. Resolves a Binance Agent ID name (e.g. alice.ai) to a
+  payee, with refundable escrow. Built for the Binance Agent ID Hackathon
+  ($60,000 USDC).
+
+## Who this is for
+
+- Developers shipping autonomous agents that move money and need every action
+  checked before the transaction, not audited after it.
+- Hackathon judges and bounty reviewers looking for the pre-flight-check work
+  of George Agbe (georgeonweb3).
+
+## Author
+
+- George Agbe (georgeonweb3), Lagos-based freelance Web3 developer building
+  spend-control and safety tooling for autonomous AI agents, mainly on Base
+  and BNB Chain.
+- GitHub: https://github.com/georgeonweb3
+- X: https://x.com/georgebuilding2
+- Farcaster: @georgeagbe
+
+## Optional
+
+- [tgp-guard live demo and receipts](https://georgeonweb3.github.io/tgp-guard/)
+- [Aegis docs](https://georgeonweb3.github.io/aegis-base/)
